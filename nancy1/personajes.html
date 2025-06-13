@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>actividad 7</title>
+</head>
+<body>
+    <style>
+        :root{
+            --color-primario:#bac9ea;
+            --color-secundario: #93a6cf;
+            --color-terciario:#6d778d;
+            --color-cuarto:#5e729f;
+            --color-quinto:#293d6a;
+        }
+        *{
+            box-sizing: border-box;
+        }
+        body {
+            background-color: var(--color-primario);
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            margin: 0;
+        }
+        header {
+            padding: 15px;
+            display: flex;
+            justify-content: flex-end;
+            background-color: var(--color-secundario);
+        }
+        .search {
+            background: var(--color-primario);
+            border: 2px solid var(--color-terciario);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+            border-radius: 50px;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 15px;
+            padding: 8px 15px ;
+            color: var(color-terciario) ;
+        }
+        .search::placeholder {
+            color: var(--color-terciario);
+        }
+        .search:focus {
+            outline: none;
+            background-color: var(--color-quinto);
+        }
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .personaje {
+            width: 400px;
+            margin: 15px;
+            background-color: var(--color-secundario);
+            box-shadow: 10px 15px 1px var(--color-cuarto);
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .personaje img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+        }
+        .personaje-info {
+            color: var(--color-terciario);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 15px 15px 15px;
+            letter-spacing: 5px;
+        }
+        .personaje-info h3 {
+            color: var(--color-terciario);
+            margin-top: 0;
+        }
+        .personaje-info h1 {
+           color: var(--color-primario);
+           margin-top: 0;
+        }
+        .descripcion {
+            background-color:var(--color-quinto);
+            padding: 15px;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            max-height: 100%;
+            transform: translateY(101%);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in;
+        }
+
+        .personaje:hover .descripcion {
+            transform: translateY(0);
+        }
+    </style>
+
+
+    <header>
+        <form id="form">
+            <img src="logo.jpg" alt="logo" style="width: 100px;">
+        <input type="text" id="search" class="search" placeholder="Busca tu personaje"></form>
+    </header>
+    <main id="main"></main>
+    
+    <script>
+        const API_URL = 'https://dragonball-api.com/api/characters';
+
+        const main = document.getElementById('main');
+        const form = document.getElementById('form');
+        const search = document.getElementById('search');
+
+        getCharacters(API_URL)
+        async function getCharacters(url){
+            const res = await fetch(url);
+            const data = await res.json();
+            showCharacters(data.items || data);
+        }
+        function showCharacters(characters){
+            main.innerHTML ='';
+            characters.forEach((char) => {
+                // Esta linea va a poner todos los elementos a principio , para eso el
+                //forEach es smimilar al "for", pero el for tiene su inclinacion,  condicion y limitante
+                const {id, name, image, ki, maxki,  gender, descripcion, race } = char;
+                //esta linea pone lo que nos va a interesar del API que vamos a obtener
+                const charElement = document.createElement('div');
+                charElement.classList.add('personaje');
+                charElement.innerHTML = `
+                <img src = "${image}" alt="${name}">
+                <div class="personaje-info">
+                    <h1>${id}</h1>
+                    <h3>${name}</h3>
+                    <br>
+                   ${race}
+                        </div>
+                        <div class = "descripcion">
+                            <h3>descripcion</h3>
+                            ${descripcion}
+                            <p><strong>Ki:</strong> ${ki} </p>
+                            <p><strong>max ki:</strong> ${maxki}</p>
+                            <p>${descripcion || "sin descripcion disponible"}</p>
+                        </div>`;
+                    main.appendChild(charElement);
+            })}
+            
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault()
+                    const searchTerm = search.value.toLowerCase();
+                    if(searchTerm && searchTerm !== ''){
+                        getCharacters(API_URL + '?name=${searchTerm}')
+                        search.value='';
+                    }else{
+                        window.location.reload();
+                    }
+
+                })
+    </script>
+
+</body>
+</html>

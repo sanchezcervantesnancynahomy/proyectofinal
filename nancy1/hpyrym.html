@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hp y rym</title>
+</head>
+<body>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        :root {
+            --primary-color: #052e53;
+            --secondary-color: #759fcf;
+            --terceary-color: #072844;
+        }
+        body {
+            background-color: var(--primary-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        header {
+            padding: 1rem;
+            display: flex;
+            justify-content: flex-end;
+            background-color: var(--terceary-color);
+        }
+        .search {
+            background-color: transparent;
+            border: 5px solid var(--primary-color);
+            border-radius: 50px;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 15px;
+            padding: 0.5rem 1rem;
+            color: var(--primary-color);
+        }
+        .search::placeholder {
+            color: var(--terceary-color);
+        }
+        .search:focus {
+            outline: none;
+            background-color: var(--primary-color);
+        }
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .personajes {
+            width: 300px;
+            margin: 15px;
+            background-color: var(--secondary-color);
+            box-shadow: 0 5px 5px black;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        .personajes img {
+            width: 100%;
+        }
+        .personajes-info {
+            color: var(--primary-color);
+            display: flex;
+            align-items: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+            padding: 8px 15px 15px;
+            letter-spacing: 8px;
+        }
+        .personajes-info h3 {
+            margin-top: 0;
+        }
+        .personajes-info span {
+            background-color: var(--primary-color);
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .descripcion {
+            background-color: rgb(121, 183, 241);
+            padding: 2rem;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            max-height: 100%;
+            transform: translateY(101%);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in;
+        }
+
+        .personajes:hover .descripcion {
+            transform: translateY(0);
+        }
+    </style>
+
+
+    <header>
+        <form id="form">
+        <input type="text" id="search" class="search" placeholder="Busca tu pelicula"></form>
+    </header>
+    <main id="main"></main>
+    
+    <script>
+        const API_HP = 'https://hp-api.onrender.com/api/characters';
+        const API_RICK = 'https://rickandmortyapi.com/api/character';
+
+        const main = document.getElementById('main');
+        const form = document.getElementById('form');
+        const search = document.getElementById('search');
+
+        getAllCharacters();
+
+        async function getAllCharacters(){
+            const [rmRes, hpRes] = await Promise.all([
+                fetch(API_RICK).then(res => res.json()),
+                fetch(API_HP).then(res => res.json())
+            ]);
+           const rickChars = rmRes.results || [];
+           const hpChars = hpRes || [];
+
+           showCharacters([...rickChars, ...hpChars]);
+        }
+        function showCharacters(characters){
+            main.innerHTML = '';
+
+            characters.forEach((char) => {
+                let name = char.name ||'desconocido';
+                let alternate_names = char.alternate_names || '';
+                let species = char.species || '';
+                let gender = char.gender || '';
+                let house = char.house || '';
+                let dateOfBirth = char.dateOfBirth || '';
+                let image = char.image ||'';
+                let wizard = char.wizard || '';
+                let ancestry = char.ancestry || '';
+
+
+                const charElements = document.createElement('div');
+                charElements.classList.add('personajes');
+                
+                charElements.innerHTML = `
+                <img src = "${image}" alt="${name}">
+                <div> 
+                     <h1> Nombre: ${name}</h1>
+                    <span> Especie: ${species}</span>
+                    </div>
+                <div class="descripcion">
+                <h3>descripcion</h3>
+                <h3> Nombres alternativos:${alternate_names}</h3>
+                <p> Genero: ${gender}</p>
+                <p> Casa: ${house}</p>
+                <p> Fecha de nacimiento: ${dateOfBirth}</p>
+                <p> Mago: ${wizard}</p>
+                <p> Ancestro: ${ancestry}</p>
+ 
+
+               </div> `;
+                    main.appendChild(charElements);
+            });}
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault()
+                const searchTerm = search.value.toLowerCase();
+                if(searchTerm && searchTerm !== ''){
+                    getAllCharacters(`${API_HP} ?name=${searchTerm}`)
+                    search.value='';
+                }else{window.location.reload();}
+            })
+            
+    </script>
+
+</body>
+</html>
